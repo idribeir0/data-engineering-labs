@@ -1,39 +1,22 @@
--- creating a sample orders table
-
-CREATE OR REPLACE TEMPORARY TABLE orders (
-    customer_id INT,
-    order_id INT,
-    amount DECIMAL(10,2)
-    order_date DATE
+-- Creating a sample seller performance table
+CREATE OR REPLACE TEMPORARY TABLE sellers (
+    seller_id INT,
+    name STRING,
+    total_sales DECIMAL(10,2)
 );
 
-INSERT INTO order VALUES
-(1, 101, 100.00, '2021-01-01'),
-(1, 102, 200.00, '2021-01-02'),
-(2, 103, 150.00, '2021-01-03'),
-(2, 104, 300.00, '2021-01-04'),
-(3, 105, 120.00, '2021-01-05'),
-(3, 106, 250.00, '2021-01-06'),
+INSERT INTO sellers VALUES
+(1, 'Ana', 5000.00),
+(2, 'Bruno', 7000.00),
+(3, 'Carlos', 7000.00),
+(4, 'Diana', 3000.00),
+(5, 'Edu', 10000.00);
 
--- using row number to order each customer orders
+-- Ranking sellers by total sales
 SELECT
-    customer_id,
-    order_id,
-    amount,
-    order_date,
-    ROW_NUMBER() OVER (PARTITION BY customer_id ORDER BY order_date) AS rn 
-FROM orders
-
--- selecting only the first order from each customer
-
-SELECT * 
-FROM (
-    SELECT 
-    customer_id,
-    order_id,
-    amount,
-    order_date,
-    ROW_NUMBER() OVER (PARTITION BY customer_id ORDER BY order_date) AS rn
-FROM orders
-)
-WHERE rn = 1;
+    seller_id,
+    name,
+    total_sales,
+    RANK() OVER (ORDER BY total_sales DESC) AS rank_standard,
+    DENSE_RANK() OVER (ORDER BY total_sales DESC) AS rank_dense
+FROM sellers;
